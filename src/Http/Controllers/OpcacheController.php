@@ -12,63 +12,68 @@ class OpcacheController
     {
         $this->validateRequest($request);
         $opcache = new OpcacheClass();
-        $action = $request->get("action", "status");
-        $format = $request->get("format", "json");
-        if($action == "status"){
+        $action = $request->get('action', 'status');
+        $format = $request->get('format', 'json');
+        if ($action == 'status') {
             $data = $opcache->getStatus();
+
             return $this->getResponse($data, $format);
         }
-        if($action == "clear"){
-            $cleared = (bool)$opcache->clear();
+        if ($action == 'clear') {
+            $cleared = (bool) $opcache->clear();
             $data = $opcache->getStatus();
-            $data["opcache_cleared"] = $cleared ? "YES" : "NO";
+            $data['opcache_cleared'] = $cleared ? 'YES' : 'NO';
+
             return $this->getResponse($data, $format);
         }
         abort(404);
     }
 
-
-    protected function validateRequest(Request $request){
+    protected function validateRequest(Request $request)
+    {
         $valid_url = URL::hasValidRelativeSignature($request);
         $from_valid_ip = config('opcache.validate_ip') ? in_array($this->getRequestIp($request), [$this->getServerIp(), '127.0.0.1', '::1']) : true;
-        if(!$valid_url || !$from_valid_ip){
+        if (! $valid_url || ! $from_valid_ip) {
             abort(403);
         }
     }
 
     protected function getResponse(array $data, $type = 'html')
     {
-        if($type == 'json'){
+        if ($type == 'json') {
             return response()->json($data);
-        }elseif ($type == 'html'){
+        } elseif ($type == 'html') {
             $data = $this->flatten($data);
-            $html = "<ul>";
-            foreach ($data as $k => $v){
+            $html = '<ul>';
+            foreach ($data as $k => $v) {
                 $html .= "<li>$k : $v</li>";
             }
-            $html .= "</ul>";
+            $html .= '</ul>';
+
             return response($html);
-        }elseif ($type == 'cli'){
+        } elseif ($type == 'cli') {
             $data = $this->flatten($data);
             $html = [];
-            foreach ($data as $k => $v){
+            foreach ($data as $k => $v) {
                 $html[] = "$k =\t$v";
             }
             $html = implode("\n", $html);
+
             return response($html);
         }
     }
 
-    protected function flatten($array, $prefix = '') {
-        $result = array();
-        foreach($array as $key=>$value) {
-            if(is_array($value)) {
-                $result = $result + $this->flatten($value, $prefix . $key . '.');
-            }
-            else {
-                $result[$prefix . $key] = $value;
+    protected function flatten($array, $prefix = '')
+    {
+        $result = [];
+        foreach ($array as $key => $value) {
+            if (is_array($value)) {
+                $result = $result + $this->flatten($value, $prefix.$key.'.');
+            } else {
+                $result[$prefix.$key] = $value;
             }
         }
+
         return $result;
     }
 
@@ -102,5 +107,4 @@ class OpcacheController
 
         return '127.0.0.1';
     }
-
 }

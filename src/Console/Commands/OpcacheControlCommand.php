@@ -8,7 +8,6 @@ use Illuminate\Support\Facades\URL;
 
 class OpcacheControlCommand extends Command
 {
-
     /**
      * The console command name.
      *
@@ -34,14 +33,15 @@ class OpcacheControlCommand extends Command
         $response = $this->sendRequest($action);
         $response->throw();
         $body = $response->body();
-        $this->warn("Result:");
+        $this->warn('Result:');
         $this->info($body);
     }
 
     protected function sendRequest($action = 'status')
     {
         $url = URL::signedRoute('laravel.opcache.control', ['action' => $action, 'format' => 'cli'], now()->addSeconds(60), false);
-        $url = rtrim(config('opcache.url'), "/") . $url;
+        $url = rtrim(config('opcache.url'), '/').$url;
+
         return Http::withHeaders(config('opcache.headers'))
             ->withOptions(['verify' => config('opcache.verify')])
             ->get($url);

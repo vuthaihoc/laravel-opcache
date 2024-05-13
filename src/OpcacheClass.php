@@ -12,6 +12,7 @@ class OpcacheClass
         if (function_exists('opcache_reset')) {
             return opcache_reset();
         }
+
         return null;
     }
 
@@ -23,7 +24,7 @@ class OpcacheClass
         if (function_exists('opcache_get_status')) {
             return opcache_get_status(false);
         }
-        return ["opcache_installed" => "NO"];
-    }
 
+        return ['opcache_installed' => 'NO'];
+    }
 }
