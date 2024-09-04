@@ -11,7 +11,7 @@ class OpcacheController
     public function __invoke(Request $request)
     {
         $this->validateRequest($request);
-        $opcache = new OpcacheClass();
+        $opcache = new OpcacheClass;
         $action = $request->get('action', 'status');
         $format = $request->get('format', 'json');
         if ($action == 'status') {
